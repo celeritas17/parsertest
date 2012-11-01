@@ -191,7 +191,12 @@ string eval(const vector<string>& input){
             
             else {  // this means that the body is not a function application or another abstraction
                 
-                output = input[3];
+                if (arg != "")
+                    output = input[3];
+                else{
+                    for (int p = 0; p < NUM_TOKENS; p++)
+                       output += input[p] + " ";
+                }
                 //body_expr = bound_var;
                 //cout << "Failed\n";
                 
