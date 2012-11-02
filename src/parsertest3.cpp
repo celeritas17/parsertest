@@ -124,31 +124,38 @@ string eval(const vector<string>& input){
     // Extract bound variable and body expression.
     //////////////////////////////////////
     
-    //forward_counter = 1;
+    forward_counter = 1;
     embed_level = 0;
     
   
     
     
         
-    if (input[0] == "("){ 
+    if (input[0] == "("){
         
-    
+        embed_level++;
+        
+        while(input[forward_counter] == "("){
+            
             embed_level++;
-        if (input[1] == "lambda"){// The bound variable is always the next token after the (first) lambda
+            forward_counter++;
+            
+        }
+        
+        if (input[forward_counter] == "lambda"){// The bound variable is always the next token after the (first) lambda
             
             
             
-            bound_var = input[2];
+            bound_var = input[forward_counter + 1];
             
             
             cout << bound_var<< "\n";
             
-            if (input[3] == "("){
+            if (input[forward_counter + 2] == "("){
                 
                 if (arg != ""){
                 
-                forward_counter = 3;
+                forward_counter += 2;
                 
                 embed_level++;
                 
@@ -164,7 +171,7 @@ string eval(const vector<string>& input){
                         embed_level--;
                     
                     if (input[forward_counter] == bound_var){
-                        body_expr += strip_outer_parens(arg) + " ";          //////////Danger!
+                        body_expr += arg + " ";          //////////Danger!
                         forward_counter++;
                     }
                     
