@@ -115,7 +115,7 @@ string eval(const vector<string>& input){
     } // end if
     
     else{
-        output = "Error: No opening paren.";
+        //output = "Error: No opening paren.";
     }
     
     ///////////////////////////////////////
@@ -139,9 +139,11 @@ string eval(const vector<string>& input){
             
             embed_level++;
             forward_counter++;
+            //body_expr += "( ";
             
         }
         
+                
         if (input[forward_counter] == "lambda"){// The bound variable is always the next token after the (first) lambda
             
             
@@ -153,16 +155,18 @@ string eval(const vector<string>& input){
             
             if (input[forward_counter + 2] == "("){
                 
+                embed_level++;
+                
                 if (arg != ""){
                 
                 forward_counter += 2;
                 
-                embed_level++;
+                //embed_level++;
                 
                 body_expr += input[forward_counter++] + " "; // Advance counter to start of body expression and start
                 // building body expression.
                 
-                while(embed_level > 1){
+                while(embed_level > 1 || input[forward_counter] == "("){
                     
                     if (input[forward_counter] == "(")
                         embed_level++;
@@ -246,8 +250,12 @@ string eval(const vector<string>& input){
         //output = body_expr;
         
     }
-        else
-            output = input[0];
+    else{
+        for (int j = 0; j < NUM_TOKENS; j++)
+            output += input[j] + " ";
+
+    }
+        
 
 
     //////////////////////////////////////
