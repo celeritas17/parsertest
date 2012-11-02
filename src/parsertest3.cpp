@@ -12,6 +12,19 @@
 
 using namespace std;
 
+string strip_outer_parens(const string& expr){
+    string output = "";
+    
+    if (expr[0] == '(' && expr[expr.size() - 2] == ')')
+        output = expr.substr(1, expr.size() - 3);
+        
+    else
+        output = expr;
+    
+    return output;
+}
+
+
 vector<string> parse(const string& input){
     
     vector<string> tokens;
@@ -58,7 +71,7 @@ string eval(const vector<string>& input){
     
     int forward_counter = 1;
     
-    int backward_counter = NUM_TOKENS - 1;
+   // int backward_counter = NUM_TOKENS - 1;
     
     
     // Extract the argument expression, then simplify it.
@@ -87,10 +100,16 @@ string eval(const vector<string>& input){
         while (forward_counter < NUM_TOKENS)
             arg_expr += input[forward_counter++] + " ";
             
-        if (arg_expr != "")
+        if (arg_expr != ""){
             arg = eval(parse(arg_expr));
-        else
+            
+        }
+        
+        else{
+            
             arg = arg_expr;
+                   }
+        
         cout << arg << "\n";
         
     } // end if
@@ -145,7 +164,7 @@ string eval(const vector<string>& input){
                         embed_level--;
                     
                     if (input[forward_counter] == bound_var){
-                        body_expr += arg + " ";          //////////Danger!
+                        body_expr += strip_outer_parens(arg) + " ";          //////////Danger!
                         forward_counter++;
                     }
                     
@@ -165,14 +184,16 @@ string eval(const vector<string>& input){
                 cout << body_expr << "\n";
                 
                 //output = eval(parse("(lambda " + bound_var + " " + eval(parse(body_expr)) + " " + arg_expr + ")"));
-                
-                    output = eval(parse(body_expr));   ///////////Test!
                     
+                    output = eval(parse(body_expr));   ///////////Test!
+                                        
                 }// end if
                 
                 else {
                     for (int k = 0; k < NUM_TOKENS; k++)
                         output += input[k] + " ";   /////////////////////////Danger!
+                    
+                   
                 }
                 
             }  //end if
@@ -181,12 +202,14 @@ string eval(const vector<string>& input){
                 //cout << "input[3] == bound_var\n";
                 if (arg != ""){
                     output = arg;
+                    
                     //cout << "arg_expr not null\n";
                 }
                 else{
                     for (int k = 0; k < NUM_TOKENS; k++)
                         output += input[k] + " ";
-                }
+                    
+                                    }
             }
             
             else {  // this means that the body is not a function application or another abstraction
@@ -196,7 +219,8 @@ string eval(const vector<string>& input){
                 else{
                     for (int p = 0; p < NUM_TOKENS; p++)
                        output += input[p] + " ";
-                }
+                    
+                                    }
                 //body_expr = bound_var;
                 //cout << "Failed\n";
                 
@@ -211,7 +235,7 @@ string eval(const vector<string>& input){
             for (int j = 0; j < NUM_TOKENS; j++)
                 output += input[j] + " ";
         
-        }
+                    }
         //output = body_expr;
         
     }
@@ -223,6 +247,7 @@ string eval(const vector<string>& input){
     
     //output += body_expr;
     
+        
     return output;
 }
 
@@ -231,6 +256,12 @@ int main(int argc, const char * argv[])
 {
     string test_string;
     vector<string> tokens;
+    
+    //string test = "(test)";
+ 
+    //if (test[0] == '(' && test[test.size() - 1] == ')')
+      //  cout << strip_outer_parens(test) << "\n";
+    
     
     while (test_string.find(EOF) == test_string.npos){
         
