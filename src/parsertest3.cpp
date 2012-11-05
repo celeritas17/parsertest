@@ -143,6 +143,9 @@ string eval(const vector<string>& input){
             
         }
         
+        //for (int p = 0; p < (embed_level - forward_counter) + 1; p++)
+          //  body_expr += "( ";;
+        
                 
         if (input[forward_counter] == "lambda"){// The bound variable is always the next token after the (first) lambda
             
@@ -151,7 +154,7 @@ string eval(const vector<string>& input){
             bound_var = input[forward_counter + 1];
             
             
-            cout << bound_var<< "\n";
+            cout << bound_var<< "\n" << forward_counter << "\n";
             
             if (input[forward_counter + 2] == "("){
                 
@@ -209,7 +212,7 @@ string eval(const vector<string>& input){
                 
             }  //end if
             
-            else if (input[3] == bound_var){
+            else if (input[forward_counter + 2] == bound_var){
                 //cout << "input[3] == bound_var\n";
                 if (arg != ""){
                     output = arg;
@@ -226,7 +229,7 @@ string eval(const vector<string>& input){
             else {  // this means that the body is not a function application or another abstraction
                 
                 if (arg != "")
-                    output = input[3];
+                    output = input[forward_counter + 2];
                 else{
                     for (int p = 0; p < NUM_TOKENS; p++)
                        output += input[p] + " ";
