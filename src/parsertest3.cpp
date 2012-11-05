@@ -36,25 +36,23 @@ vector<string> parse(const string& input){
     string buffer = "";
     
     while (i < input.size()) {
-        if (input[i] != ' ' && input[i] != '\t' && input[i] != '\n'){
-            while (input[i] != ' ' && input[i] != '\t' && input[i] != '\n' && i < input.size()){
-                if ((input[i] == '(' || input[i] == ')') && next_token != ""){
-                    tokens.push_back(next_token);
-                    tokens.push_back(buffer += input[i++]);
-                    buffer = "";
-                    next_token = "";
-                }
-                else if ((input[i] == '(' || input[i] == ')') && next_token == ""){
-                    tokens.push_back(buffer += input[i++]);
-                    buffer = "";
-                }
-                else
-                    next_token += input[i++];
-            }
-            if (next_token != ""){
+        while (input[i] != ' ' && input[i] != '\t' && input[i] != '\n' && i < input.size()){
+            if ((input[i] == '(' || input[i] == ')') && next_token != ""){
                 tokens.push_back(next_token);
+                tokens.push_back(buffer += input[i++]);
+                buffer = "";
                 next_token = "";
             }
+            else if ((input[i] == '(' || input[i] == ')') && next_token == ""){
+                tokens.push_back(buffer += input[i++]);
+                buffer = "";
+            }
+            else
+                next_token += input[i++];
+        }
+        if (next_token != ""){
+            tokens.push_back(next_token);
+            next_token = "";
         }
         i++;
     }
