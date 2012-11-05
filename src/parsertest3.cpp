@@ -14,6 +14,26 @@ using namespace std;
 
 string eval(const vector<string>& input);
 
+string to_string(const vector<string>& input, string sep, int start, int end) {
+    string output;
+    for (int i = start; i < end; i++) {
+        output += input[i] + sep;
+    }
+    return output;
+}
+
+string to_string(const vector<string>& input, int start, int end) {
+  return to_string(input, "", start, end);
+}
+
+string to_string(const vector<string>& input, string sep) {
+  return to_string(input, sep, 0, input.size());
+}
+
+string to_string(const vector<string>& input) {
+  return to_string(input, "", 0, input.size());
+}
+
 string strip_outer_parens(const string& expr){
     string output = "";
     
@@ -110,7 +130,8 @@ string eval_arg(const vector<string>& input) {
 string eval(const vector<string>& input){
     
     int embed_level = 0;    // Balance check for parentheses.
-    string bound_var, body_expr, arg_expr, arg, output;
+    string bound_var, body_expr, arg_expr, arg;
+    string output = "";
     const int NUM_TOKENS = input.size();
 
     arg = eval_arg(input);
@@ -125,20 +146,11 @@ string eval(const vector<string>& input){
             
             embed_level++;
             forward_counter++;
-            //body_expr += "( ";
-            
         }
-        
-        //for (int p = 0; p < (embed_level - forward_counter) + 1; p++)
-          //  body_expr += "( ";;
-        
                 
         if (input[forward_counter] == "lambda"){// The bound variable is always the next token after the (first) lambda
             
-            
-            
             bound_var = input[forward_counter + 1];
-            
             
             cout << bound_var<< "\n" << forward_counter << "\n";
             
@@ -148,110 +160,61 @@ string eval(const vector<string>& input){
                 
                 if (arg != ""){
                 
-                forward_counter += 2;
+                    forward_counter += 2;
                 
-                //embed_level++;
+                    //embed_level++;
                 
-                body_expr += input[forward_counter++] + " "; // Advance counter to start of body expression and start
-                // building body expression.
+                    body_expr += input[forward_counter++] + " "; // Advance counter to start of body expression and start
+                    // building body expression.
                 
-                while(embed_level > 1 || input[forward_counter] == "("){
+                    while(embed_level > 1 || input[forward_counter] == "("){
                     
-                    if (input[forward_counter] == "(")
-                        embed_level++;
+                        if (input[forward_counter] == "(")
+                            embed_level++;
                     
-                    if (input[forward_counter] == ")")
-                        embed_level--;
+                        if (input[forward_counter] == ")")
+                            embed_level--;
                     
-                    if (input[forward_counter] == bound_var){
-                        body_expr += arg + " ";          //////////Danger!
-                        forward_counter++;
-                    }
+                        if (input[forward_counter] == bound_var){
+                            body_expr += arg + " ";          //////////Danger!
+                            forward_counter++;
+                        }
                     
-                    else
-                        body_expr += input[forward_counter++] + " ";
+                        else
+                            body_expr += input[forward_counter++] + " ";
                     
                     
-                    //cout << "still going\n";
+                        //cout << "still going\n";
                     
-                }  //end while
+                    }  //end while
                 
-                if (input[forward_counter] == bound_var)
-                    body_expr += arg + " ";
-                else if (input[forward_counter] != ")")
-                    body_expr += input[forward_counter] + " "; /////////test!
+                    if (input[forward_counter] == bound_var)
+                        body_expr += arg + " ";
+                    else if (input[forward_counter] != ")")
+                        body_expr += input[forward_counter] + " "; /////////test!
                 
-                cout << body_expr << "\n";
+                    cout << body_expr << "\n";
                 
-                //output = eval(parse("(lambda " + bound_var + " " + eval(parse(body_expr)) + " " + arg_expr + ")"));
+                    //output = eval(parse("(lambda " + bound_var + " " + eval(parse(body_expr)) + " " + arg_expr + ")"));
                     
                     output = eval(parse(body_expr));   ///////////Test!
                                         
-                }// end if
-                
-                else {
-                    for (int k = 0; k < NUM_TOKENS; k++)
-                        output += input[k] + " ";   /////////////////////////Danger!
-                    
-                   
                 }
-                
-            }  //end if
-            
-            else if (input[forward_counter + 2] == bound_var){
-                //cout << "input[3] == bound_var\n";
-                if (arg != ""){
-                    output = arg;
-                    
-                    //cout << "arg_expr not null\n";
-                }
-                else{
-                    for (int k = 0; k < NUM_TOKENS; k++)
-                        output += input[k] + " ";
-                    
-                                    }
             }
-            
+            else if (input[forward_counter + 2] == bound_var){
+                if (arg != "")
+                    output = arg;
+            }
             else {  // this means that the body is not a function application or another abstraction
-                
                 if (arg != "")
                     output = input[forward_counter + 2];
-                else{
-                    for (int p = 0; p < NUM_TOKENS; p++)
-                       output += input[p] + " ";
-                    
-                                    }
-                //body_expr = bound_var;
-                //cout << "Failed\n";
-                
             }
-            
-            //output = body_expr;
-            
-        }
-        
-        else{
-            
-            for (int j = 0; j < NUM_TOKENS; j++)
-                output += input[j] + " ";
-        
-                    }
-        //output = body_expr;
-        
+        } 
     }
-    else{
-        for (int j = 0; j < NUM_TOKENS; j++)
-            output += input[j] + " ";
 
-    }
-        
+    if (output == "")
+      output = to_string(input, " ");
 
-
-    //////////////////////////////////////
-    
-    //output += body_expr;
-    
-        
     return output;
 }
 
