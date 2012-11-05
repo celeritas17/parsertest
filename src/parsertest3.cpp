@@ -127,6 +127,36 @@ string eval_arg(const vector<string>& input) {
     return arg;
 }
 
+string eval_body(const vector<string>& input, string arg, string bound_var, int forward_counter, int embed_level) {
+    string body_expr = input[forward_counter++] + " ";
+
+    while(embed_level > 1 || input[forward_counter] == "("){
+
+        if (input[forward_counter] == "(")
+            embed_level++;
+
+        if (input[forward_counter] == ")")
+            embed_level--;
+
+        if (input[forward_counter] == bound_var){
+            body_expr += arg + " ";          //////////Danger!
+            forward_counter++;
+        }
+        else {
+            body_expr += input[forward_counter++] + " ";
+        }
+    }
+
+    if (input[forward_counter] == bound_var)
+        body_expr += arg + " ";
+    else if (input[forward_counter] != ")")
+        body_expr += input[forward_counter] + " "; /////////test!
+
+    cout << body_expr << "\n";
+
+    return eval(parse(body_expr));   ///////////Test!
+}
+
 string eval(const vector<string>& input){
     
     int embed_level = 0;    // Balance check for parentheses.
@@ -143,7 +173,6 @@ string eval(const vector<string>& input){
         embed_level++;
         
         while(input[forward_counter] == "("){
-            
             embed_level++;
             forward_counter++;
         }
@@ -159,46 +188,8 @@ string eval(const vector<string>& input){
                 embed_level++;
                 
                 if (arg != ""){
-                
                     forward_counter += 2;
-                
-                    //embed_level++;
-                
-                    body_expr += input[forward_counter++] + " "; // Advance counter to start of body expression and start
-                    // building body expression.
-                
-                    while(embed_level > 1 || input[forward_counter] == "("){
-                    
-                        if (input[forward_counter] == "(")
-                            embed_level++;
-                    
-                        if (input[forward_counter] == ")")
-                            embed_level--;
-                    
-                        if (input[forward_counter] == bound_var){
-                            body_expr += arg + " ";          //////////Danger!
-                            forward_counter++;
-                        }
-                    
-                        else
-                            body_expr += input[forward_counter++] + " ";
-                    
-                    
-                        //cout << "still going\n";
-                    
-                    }  //end while
-                
-                    if (input[forward_counter] == bound_var)
-                        body_expr += arg + " ";
-                    else if (input[forward_counter] != ")")
-                        body_expr += input[forward_counter] + " "; /////////test!
-                
-                    cout << body_expr << "\n";
-                
-                    //output = eval(parse("(lambda " + bound_var + " " + eval(parse(body_expr)) + " " + arg_expr + ")"));
-                    
-                    output = eval(parse(body_expr));   ///////////Test!
-                                        
+                    output = eval_body(input, arg, bound_var, forward_counter, embed_level);                    
                 }
             }
             else if (input[forward_counter + 2] == bound_var){
