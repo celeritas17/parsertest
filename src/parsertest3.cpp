@@ -12,6 +12,8 @@
 
 using namespace std;
 
+string eval(const vector<string>& input);
+
 string strip_outer_parens(const string& expr){
     string output = "";
     
@@ -60,25 +62,13 @@ vector<string> parse(const string& input){
     return tokens;
 }
 
-string eval(const vector<string>& input){
-    
-    
-    int embed_level = 0;    // Balance check for parentheses.
-    string bound_var, body, body_expr, arg_expr, arg, inner_arg, next_lambda, output;
-    const int NUM_TOKENS = input.size();
-    
+string find_arg_expr(const vector<string>& input, int embed_level) {
+
     int forward_counter = 1;
-    
-    // int backward_counter = NUM_TOKENS - 1;
-    
-    
-    // Extract the argument expression, then simplify it.
-    ///////////////////////////////////////
-    
-    if (input[0] == "("){               // the first token in the input must be an opening paren, or else it's invalid.
-        
+    string arg_expr = "";
+
+    if (input[0] == "(") {
         embed_level++;
-    
         while(embed_level != 0){
             
             if (input[forward_counter] == "(")
@@ -86,8 +76,7 @@ string eval(const vector<string>& input){
             else if (input[forward_counter] == ")")
                 embed_level--;
             
-            if (forward_counter > NUM_TOKENS - 1){
-                output = "Error: Unbalanced parentheses";  //handle differently
+            if (forward_counter > input.size() - 1){
                 break;
             }
             else
@@ -95,39 +84,38 @@ string eval(const vector<string>& input){
             
         } // end while
         
-        while (forward_counter < NUM_TOKENS)
+        while (forward_counter < input.size())
             arg_expr += input[forward_counter++] + " ";
-            
-        if (arg_expr != ""){
-            arg = eval(parse(arg_expr));
-            
-        }
-        
-        else{
-            
-            arg = arg_expr;
-                   }
-        
-        cout << arg << "\n";
-        
-    } // end if
-    
-    else{
-        //output = "Error: No opening paren.";
     }
+    return arg_expr;
+}
+
+string eval_arg(const vector<string>& input) {
     
-    ///////////////////////////////////////
+    string arg, arg_expr;
+    int forward_counter = 1;
+
+    arg_expr = find_arg_expr(input, 0);
+
+    if (arg_expr != "")
+        arg = eval(parse(arg_expr)); // eval arg_expr first
+    else
+        arg = arg_expr;
     
+    cout << "ARG:" << arg << "\n";
+
+    return arg;
+}
+
+string eval(const vector<string>& input){
     
-    // Extract bound variable and body expression.
-    //////////////////////////////////////
+    int embed_level = 0;    // Balance check for parentheses.
+    string bound_var, body_expr, arg_expr, arg, output;
+    const int NUM_TOKENS = input.size();
+
+    arg = eval_arg(input);
     
-    forward_counter = 1;
-    embed_level = 0;
-    
-  
-    
-    
+    int forward_counter = 1;
         
     if (input[0] == "("){
         
