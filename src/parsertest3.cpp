@@ -13,6 +13,7 @@
 using namespace std;
 
 string eval(const vector<string>& input);
+string eval_args(const vector<string>& input);
 
 vector<string> split_arg_list(const string input){
     vector<string> args;
@@ -113,6 +114,7 @@ string find_arg_expr(const vector<string>& input, int embed_level) {
         while (forward_counter < input.size())
             arg_expr += input[forward_counter++] + " ";
     }
+    cout << "arg_expr:" << arg_expr << "\n";
     return arg_expr;
 }
 
@@ -124,43 +126,37 @@ string eval_arg(const vector<string>& input) {
     arg_expr = find_arg_expr(input, 0);
     
     if (arg_expr != "")
-        arg = eval(parse(arg_expr)); // eval arg_expr first
+        arg = eval(parse(arg_expr)); 
     else
         arg = arg_expr;
-    
-    cout << "ARG:" << arg << "\n";
     
     return arg;
 }
 
-string eval_body(const vector<string>& input, string arg, string bound_var, int forward_counter, int embed_level) {
-    string body_expr = input[forward_counter++] + " ";
+string eval_body(const vector<string>& input, string arg, string bound_var, int forward_counter) {
     
-    while(embed_level > 1 || input[forward_counter] == "("){
-        
+
+    int embed_level = 0;
+
+    string body_expr = ""; 
+    
+    do {
         if (input[forward_counter] == "(")
             embed_level++;
         
-        if (input[forward_counter] == ")")
+        else if (input[forward_counter] == ")")
             embed_level--;
-        
-        if (input[forward_counter] == bound_var){
-            body_expr += arg + " ";          //////////Danger!
-            forward_counter++;
-        }
-        else {
-            body_expr += input[forward_counter++] + " ";
-        }
+            
+        if (input[forward_counter] == bound_var)
+            body_expr += arg + " ";
+        else
+            body_expr += input[forward_counter] + " "; /////////test!
+
+        forward_counter++;
     }
-    
-    if (input[forward_counter] == bound_var)
-        body_expr += arg + " ";
-    else if (input[forward_counter] != ")")
-        body_expr += input[forward_counter] + " "; /////////test!
-    
-    cout << body_expr << "\n";
-    
-    return eval(parse(body_expr));   ///////////Test!
+    while(embed_level > 0 || (embed_level == 0 && input[forward_counter] != ")")) ;
+
+    return eval_args(parse(body_expr));   ///////////Test!
 }
 
 string get_body_expr(const vector<string>& input){
@@ -194,15 +190,15 @@ string eval_args(const vector<string>& input){
     
     string next_fun = get_body_expr(input);
     
-    cout << "next_fun: " << next_fun << "\n";
-    
     vector<string> args = split_arg_list(find_arg_expr(input, 0));
     
     if (args.size() > 0){
     
         for (int i = 0; i < args.size(); i++){
-            cout << "args[i] " << args[i] << "\n";
+            cout << "In eval_args, next_fun is " << next_fun << "\n";
+            cout << "In eval_args, the next arg is  " << args[i] << "\n";
             next_fun = eval(parse(next_fun + args[i]));
+            cout << "In eval_args, next_fun is now " << next_fun << "\n";
         }
         
     }
@@ -233,7 +229,7 @@ string eval(const vector<string>& input){
             
             bound_var = input[forward_counter + 1];
             
-            cout << bound_var<< "\n" << forward_counter << "\n";
+            cout << "In eval, bound_var is " << bound_var<< "\n";
             
             if (input[forward_counter + 2] == "("){
                 
@@ -241,7 +237,7 @@ string eval(const vector<string>& input){
                 
                 if (arg != ""){
                     forward_counter += 2;
-                    output = eval_body(input, arg, bound_var, forward_counter, embed_level);
+                    output = eval_body(input, arg, bound_var, forward_counter);
                 }
             }
             else if (input[forward_counter + 2] == bound_var){
@@ -266,12 +262,17 @@ int main(int argc, const char * argv[])
 {
     string test_string;
     vector<string> tokens;
+
+  //  ifstream fin;
     
     while (test_string.find(EOF) == test_string.npos){
         
         cout << "lambda_fun> ";
         
+        
         getline(cin, test_string);
+
+
         
         tokens = parse(test_string);
         
