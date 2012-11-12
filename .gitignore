@@ -1,2 +1,10 @@
 parsertest3
 *.swp
+parsertest
+
+test
+
+*.dSYM
+*.log
+*.txt
+
