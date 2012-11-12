@@ -1,1 +1,1 @@
-# HERE BE DRAGONS
+A lambda calculus interpreter written in c++.
