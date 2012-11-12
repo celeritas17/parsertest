@@ -2,7 +2,7 @@ parsertest3
 *.swp
 parsertest
 
-test
+test/test
 
 *.dSYM
 *.log
