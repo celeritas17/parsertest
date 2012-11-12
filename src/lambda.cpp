@@ -54,7 +54,7 @@ string to_string(const vector<string>& input) {
     return to_string(input, "", 0, input.size());
 }
 
-vector<string> parse(const string& input){
+vector<string> tokenize(const string& input){
     
     vector<string> tokens;
     
@@ -109,12 +109,12 @@ string find_arg_expr(const vector<string>& input, int embed_level) {
             else
                 forward_counter++;
             
-        } // end while
+        } 
         
         while (forward_counter < input.size())
             arg_expr += input[forward_counter++] + " ";
     }
-    cout << "arg_expr:" << arg_expr << "\n";
+
     return arg_expr;
 }
 
@@ -126,7 +126,7 @@ string eval_arg(const vector<string>& input) {
     arg_expr = find_arg_expr(input, 0);
     
     if (arg_expr != "")
-        arg = eval(parse(arg_expr)); 
+        arg = eval(tokenize(arg_expr)); 
     else
         arg = arg_expr;
     
@@ -150,13 +150,13 @@ string eval_body(const vector<string>& input, string arg, string bound_var, int 
         if (input[forward_counter] == bound_var)
             body_expr += arg + " ";
         else
-            body_expr += input[forward_counter] + " "; /////////test!
+            body_expr += input[forward_counter] + " "; 
 
         forward_counter++;
     }
     while(embed_level > 0 || (embed_level == 0 && input[forward_counter] != ")")) ;
 
-    return eval_args(parse(body_expr));   ///////////Test!
+    return eval_args(tokenize(body_expr));   
 }
 
 string get_body_expr(const vector<string>& input){
@@ -193,14 +193,8 @@ string eval_args(const vector<string>& input){
     vector<string> args = split_arg_list(find_arg_expr(input, 0));
     
     if (args.size() > 0){
-    
-        for (int i = 0; i < args.size(); i++){
-            cout << "In eval_args, next_fun is " << next_fun << "\n";
-            cout << "In eval_args, the next arg is  " << args[i] << "\n";
-            next_fun = eval(parse(next_fun + args[i]));
-            cout << "In eval_args, next_fun is now " << next_fun << "\n";
-        }
-        
+        for (int i = 0; i < args.size(); i++)
+            next_fun = eval(tokenize(next_fun + args[i]));
     }
     
     return next_fun;
@@ -229,8 +223,6 @@ string eval(const vector<string>& input){
             
             bound_var = input[forward_counter + 1];
             
-            cout << "In eval, bound_var is " << bound_var<< "\n";
-            
             if (input[forward_counter + 2] == "("){
                 
                 embed_level++;
@@ -245,8 +237,12 @@ string eval(const vector<string>& input){
                     output = arg;
             }
             else {  // this means that the body is not a function application or another abstraction
-                if (arg != "")
-                    output = input[forward_counter + 2];
+                if (arg != ""){
+                    forward_counter += 2;
+                    while (input[forward_counter] != ")")
+                        output += input[forward_counter++] + " ";
+                    
+                }
             }
         }
     }
@@ -262,22 +258,16 @@ int main(int argc, const char * argv[])
 {
     string test_string;
     vector<string> tokens;
-
-  //  ifstream fin;
     
     while (test_string.find(EOF) == test_string.npos){
         
         cout << "lambda_fun> ";
         
-        
         getline(cin, test_string);
 
-
+        tokens = tokenize(test_string);
         
-        tokens = parse(test_string);
-        
-        
-        cout << eval_args(tokens) << "\n";
+        cout << "\nNormal Form: " << eval_args(tokens) << "\n\n";
         
     }
     
