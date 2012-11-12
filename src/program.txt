@@ -1,3 +1,0 @@
-(((lambda f (lambda a (f)a))))(lambda x x)
-
-
